@@ -17,17 +17,26 @@ HN: Show HN: I built a … | TechCrunch: OpenAI announces …        (4s)
 
 ## Install
 
-claudebar isn't on npm yet — install it from source:
+claudebar isn't on npm yet. The simplest way is to install it straight from GitHub (you need access to the repo). It builds itself on install:
+
+```bash
+npm install -g github:gomeslucasm/claudebar
+```
+
+That puts the `claudebar` command on your `PATH`. To update later, run the same command again.
+
+<details>
+<summary>Install from a local clone instead</summary>
 
 ```bash
 git clone https://github.com/gomeslucasm/claudebar.git
 cd claudebar
-npm install
-npm run build
-npm link        # makes the `claudebar` command available globally
+npm install      # runs the build automatically (prepare script)
+npm link         # makes the `claudebar` command available globally
 ```
 
-`npm link` exposes the `claudebar` binary on your `PATH`. (If you'd rather not link, you can call `node /path/to/claudebar/dist/cli/index.js` instead.)
+If you'd rather not link, call `node /path/to/claudebar/dist/cli/index.js` directly.
+</details>
 
 ## Quick start
 
