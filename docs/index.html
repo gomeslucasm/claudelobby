@@ -6,137 +6,132 @@
 <title>claudebar — the waiting-room display for Claude Code</title>
 <meta name="description" content="claudebar turns the bottom of your terminal into a waiting-room monitor — news, football, the live World Cup, and the time — running while Claude Code does the work." />
 <meta property="og:title" content="claudebar" />
-<meta property="og:description" content="While Claude works, you wait. Might as well check the score. A multi-line status bar for Claude Code." />
+<meta property="og:description" content="While Claude thinks, you watch the news. The waiting-room display for your terminal." />
 <meta property="og:image" content="screenshot.png" />
-<meta name="theme-color" content="#0e0e13" />
+<meta name="theme-color" content="#0b0b10" />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet" />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet" />
 <style>
   :root {
-    --bg:#0e0e13; --panel:#15151c; --code:#16161e; --line:#26262f;
-    --text:#d7dae3; --muted:#8a8e9e; --dim:#5b5e6e;
-    --accent:#d97757; --amber:#f0b35a; --link:#9bb4ef; --green:#a6e3a1;
+    --bg:#0b0b10; --panel:#13131b; --code:#15151e; --line:#26262f;
+    --text:#dadde6; --muted:#888c9c; --dim:#585b6b;
+    --accent:#d97757; --amber:#f2b04f; --link:#9bb4ef; --green:#a6e3a1; --pink:#e58fb0;
     --sans:"Inter",system-ui,-apple-system,sans-serif;
     --mono:"JetBrains Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+    --maxw:1200px;
   }
   * { box-sizing:border-box; margin:0; padding:0; }
   html { scroll-behavior:smooth; }
-  body {
-    background:var(--bg); color:var(--text); font-family:var(--sans);
-    font-size:16px; line-height:1.65; -webkit-font-smoothing:antialiased;
-  }
-  .wrap { max-width:760px; margin:0 auto; padding:0 24px; }
+  body { background:var(--bg); color:var(--text); font-family:var(--sans); font-size:16px; line-height:1.6; -webkit-font-smoothing:antialiased; overflow-x:hidden; }
+  .wrap { max-width:var(--maxw); margin:0 auto; padding:0 28px; }
+  .bleed { width:100vw; margin-left:calc(50% - 50vw); }
   a { color:var(--link); text-decoration:none; }
   a:hover { text-decoration:underline; text-underline-offset:2px; }
-  :focus-visible { outline:2px solid var(--accent); outline-offset:3px; border-radius:3px; }
+  :focus-visible { outline:2px solid var(--amber); outline-offset:3px; border-radius:3px; }
   code { font-family:var(--mono); font-size:.9em; }
 
   /* nav */
-  nav { border-bottom:1px solid var(--line); }
-  .nav { display:flex; align-items:center; justify-content:space-between; height:60px; }
-  .brand { font-family:var(--mono); font-weight:700; font-size:16px; letter-spacing:-.01em; }
+  nav { border-bottom:1px solid var(--line); position:relative; z-index:3; }
+  .nav { display:flex; align-items:center; justify-content:space-between; height:62px; }
+  .brand { font-family:var(--mono); font-weight:700; font-size:17px; letter-spacing:-.01em; }
   .brand b { color:var(--accent); }
-  .nav .right { display:flex; align-items:center; gap:18px; font-size:14px; }
-  .nav a { color:var(--muted); }
-  .nav a:hover { color:var(--text); text-decoration:none; }
-  .nav .navclock { font-family:var(--mono); font-size:12px; color:var(--amber); font-variant-numeric:tabular-nums; }
+  .nav .right { display:flex; align-items:center; gap:20px; font-size:14px; }
+  .nav a { color:var(--muted); } .nav a:hover { color:var(--text); text-decoration:none; }
+  .navclock { font-family:var(--mono); font-size:12px; color:var(--amber); font-variant-numeric:tabular-nums; border:1px solid var(--line); padding:3px 8px; border-radius:5px; }
 
-  /* hero */
-  header { padding:56px 0 8px; }
-  .eyebrow {
-    font-family:var(--mono); font-size:12px; letter-spacing:.18em; text-transform:uppercase;
-    color:var(--amber); display:inline-flex; align-items:center; gap:9px;
-  }
-  .eyebrow::before { content:""; width:7px; height:7px; border-radius:50%; background:var(--amber); animation:beat 1.8s ease-in-out infinite; }
-  @keyframes beat { 0%,100%{opacity:.35} 50%{opacity:1} }
-  h1 {
-    font-family:var(--mono); font-weight:700; letter-spacing:-.02em;
-    font-size:clamp(28px,4.6vw,40px); line-height:1.12; margin-top:16px; max-width:20ch;
-  }
-  h1 b { color:var(--accent); }
-  .tagline { margin-top:18px; font-size:clamp(16px,2.2vw,18px); color:var(--text); max-width:60ch; }
-  .tagline b { color:var(--text); font-weight:600; }
-  .aside { margin-top:8px; color:var(--muted); font-size:14.5px; max-width:58ch; }
-
-  /* ── the waiting-room monitor ── */
-  .monitor {
-    margin-top:34px; border:1px solid var(--line); border-radius:12px; overflow:hidden;
-    background:#0b0b0f; box-shadow:0 24px 60px -40px #000;
-  }
-  .monitor__head {
-    display:flex; align-items:center; justify-content:space-between;
-    padding:10px 15px; border-bottom:1px solid var(--line); background:#101015;
-    font-family:var(--mono); font-size:12px;
-  }
-  .now { color:var(--amber); letter-spacing:.14em; }
-  .now::before { content:"● "; }
-  .clock { color:var(--amber); font-variant-numeric:tabular-nums; letter-spacing:.05em; }
-  .monitor__screen { position:relative; padding:26px 22px 22px; min-height:118px; }
-  .monitor__screen::after {        /* faint CRT scanlines */
-    content:""; position:absolute; inset:0; pointer-events:none; opacity:.5;
-    background:repeating-linear-gradient(0deg, transparent 0 2px, rgba(0,0,0,.16) 2px 3px);
-  }
-  .panel { font-family:var(--mono); font-size:clamp(13px,2.3vw,16px); line-height:1.5; color:#e9ecf5; min-height:48px; }
-  .panel .tag { color:var(--link); } .panel .live { color:var(--green); font-weight:700; }
-  .panel .ft { color:var(--muted); font-weight:700; } .panel .sc { color:#fff; font-weight:700; }
-  .panel .small { color:var(--dim); }
-  .wait { margin-top:14px; font-family:var(--mono); font-size:12.5px; color:var(--muted); }
-  .wait .dot { animation:fade 1.4s infinite; } .wait .dot:nth-child(2){animation-delay:.2s} .wait .dot:nth-child(3){animation-delay:.4s}
-  @keyframes fade { 0%,100%{opacity:.2} 50%{opacity:1} }
-  .ticker { border-top:1px solid var(--line); background:#101015; overflow:hidden; padding:8px 0; }
-  .ticker__track {
-    display:inline-block; white-space:nowrap; font-family:var(--mono); font-size:12.5px; color:var(--amber);
-    animation:marquee 26s linear infinite; will-change:transform;
-  }
-  .ticker__track span { margin:0 28px; } .ticker__track .b { color:#fff; font-weight:700; }
+  /* full-width ticker band */
+  .band { background:#000; border-bottom:1px solid var(--line); overflow:hidden; padding:9px 0; position:relative; z-index:2; }
+  .band__track { display:inline-block; white-space:nowrap; font-family:var(--mono); font-size:13px; color:var(--amber); animation:marquee 34s linear infinite; will-change:transform; }
+  .band__track span { margin:0 26px; } .band__track .b { color:#fff; font-weight:700; } .band__track .x { color:var(--accent); }
   @keyframes marquee { from{transform:translateX(0)} to{transform:translateX(-50%)} }
 
+  /* hero */
+  .hero { position:relative; padding:60px 0 30px; }
+  .hero::before { content:""; position:absolute; inset:-10% -20% auto -20%; height:520px; z-index:0; pointer-events:none;
+    background:radial-gradient(60% 70% at 30% 20%, rgba(242,176,79,.10), transparent 60%), radial-gradient(50% 60% at 85% 10%, rgba(217,119,87,.12), transparent 60%); }
+  .hero__grid { position:relative; z-index:1; display:grid; grid-template-columns:1.05fr .95fr; gap:48px; align-items:center; }
+  .eyebrow { font-family:var(--mono); font-size:12px; letter-spacing:.16em; text-transform:uppercase; color:var(--amber); display:inline-flex; align-items:center; gap:9px; }
+  .eyebrow::before { content:""; width:8px; height:8px; border-radius:50%; background:var(--amber); animation:beat 1.8s ease-in-out infinite; box-shadow:0 0 10px var(--amber); }
+  @keyframes beat { 0%,100%{opacity:.35} 50%{opacity:1} }
+  h1 { font-family:var(--mono); font-weight:700; letter-spacing:-.03em; font-size:clamp(36px,5.4vw,62px); line-height:1.03; margin-top:18px; }
+  h1 .a { color:var(--accent); } h1 .y { color:var(--amber); }
+  .tagline { margin-top:22px; font-size:clamp(16px,1.5vw,18px); color:#c2c6d2; max-width:54ch; }
+  .tagline b { color:var(--text); font-weight:600; }
+  .aside { margin-top:10px; color:var(--muted); font-size:14.5px; max-width:52ch; }
+
   /* CTA */
-  .cta { margin-top:30px; display:flex; flex-wrap:wrap; align-items:center; gap:12px; }
-  .install {
-    display:flex; align-items:center; gap:12px; background:var(--code); border:1px solid var(--line);
-    border-radius:8px; padding:13px 16px; font-family:var(--mono); font-size:14px; flex:1; min-width:280px;
-  }
-  .install .p { color:var(--accent); } .install code { flex:1; overflow-x:auto; white-space:nowrap; color:var(--text); scrollbar-width:none; }
+  .cta { margin-top:28px; display:flex; flex-wrap:wrap; gap:12px; align-items:center; }
+  .install { display:flex; align-items:center; gap:12px; background:var(--code); border:1px solid var(--line); border-radius:9px; padding:13px 16px; font-family:var(--mono); font-size:14px; }
+  .install .p { color:var(--accent); } .install code { color:var(--text); white-space:nowrap; overflow-x:auto; scrollbar-width:none; }
   .install code::-webkit-scrollbar { display:none; }
   .copy { flex:none; background:transparent; border:1px solid var(--line); color:var(--muted); font-family:var(--mono); font-size:12px; padding:5px 10px; border-radius:6px; cursor:pointer; }
   .copy:hover { color:var(--text); border-color:var(--dim); } .copy.ok { color:var(--green); border-color:var(--green); }
-  .gh { display:inline-flex; align-items:center; padding:13px 18px; background:var(--accent); color:#1a120e; border-radius:8px; font-weight:600; font-size:14px; }
-  .gh:hover { background:#e08a6e; text-decoration:none; }
+  .gh { display:inline-flex; align-items:center; padding:13px 18px; background:var(--accent); color:#1a120e; border-radius:9px; font-weight:700; font-size:14px; }
+  .gh:hover { background:#e08a6e; text-decoration:none; transform:translateY(-1px); }
 
-  /* screenshot */
-  figure { margin:30px 0 8px; border:1px solid var(--line); border-radius:10px; overflow:hidden; background:var(--panel); }
+  /* the monitor */
+  .monitor { border:1px solid var(--line); border-radius:14px; overflow:hidden; background:#08080c; box-shadow:0 30px 70px -40px #000, 0 0 0 1px rgba(242,176,79,.04); }
+  .monitor__head { display:flex; align-items:center; justify-content:space-between; padding:11px 16px; border-bottom:1px solid var(--line); background:#0f0f15; font-family:var(--mono); font-size:12px; }
+  .now { color:var(--amber); letter-spacing:.14em; } .now::before { content:"● "; }
+  .gate { color:var(--dim); } .clock { color:var(--amber); font-variant-numeric:tabular-nums; letter-spacing:.05em; }
+  .monitor__screen { position:relative; padding:30px 24px; min-height:170px; display:flex; flex-direction:column; justify-content:center; }
+  .monitor__screen::after { content:""; position:absolute; inset:0; pointer-events:none; opacity:.55; background:repeating-linear-gradient(0deg, transparent 0 2px, rgba(0,0,0,.18) 2px 3px); }
+  .panel { font-family:var(--mono); font-size:clamp(14px,1.4vw,18px); line-height:1.5; color:#eef1f8; min-height:56px; }
+  .panel .tag { color:var(--link); } .panel .live { color:var(--green); font-weight:700; } .panel .ft { color:var(--muted); font-weight:700; } .panel .sc { color:#fff; font-weight:700; } .panel .small { color:var(--dim); }
+  .wait { margin-top:18px; font-family:var(--mono); font-size:12.5px; color:var(--muted); display:flex; gap:8px; flex-wrap:wrap; }
+  .wait .t { color:var(--amber); } .wait .dot { animation:fade 1.4s infinite; } .wait .dot:nth-child(2){animation-delay:.2s} .wait .dot:nth-child(3){animation-delay:.4s}
+  @keyframes fade { 0%,100%{opacity:.2} 50%{opacity:1} }
+  .monitor__foot { border-top:1px solid var(--line); background:#0f0f15; overflow:hidden; padding:7px 0; }
+  .monitor__foot .t { display:inline-block; white-space:nowrap; font-family:var(--mono); font-size:11.5px; color:var(--dim); animation:marquee 22s linear infinite; }
+  .monitor__foot .t span { margin:0 20px; }
+
+  /* full-width screenshot */
+  .shotband { background:#0f0f15; border-top:1px solid var(--line); border-bottom:1px solid var(--line); padding:34px 0; }
+  figure { border:1px solid var(--line); border-radius:10px; overflow:hidden; background:var(--panel); margin:0; }
   figure img { display:block; width:100%; height:auto; }
   figcaption { padding:11px 16px; border-top:1px solid var(--line); color:var(--muted); font-size:13px; }
 
   /* sections */
-  section { padding:46px 0; border-top:1px solid var(--line); }
-  h2 { font-family:var(--mono); font-size:13px; font-weight:700; letter-spacing:.12em; text-transform:uppercase; color:var(--accent); margin-bottom:6px; }
-  .h2sub { color:var(--muted); font-size:14.5px; margin-bottom:20px; font-style:italic; }
-  h3 { font-size:17px; font-weight:600; margin:26px 0 6px; }
-  section p { color:var(--muted); margin-bottom:14px; }
-  section p b, li b { color:var(--text); font-weight:600; }
+  section { padding:54px 0; }
+  section + section { border-top:1px solid var(--line); }
+  .h2 { font-family:var(--mono); font-size:13px; font-weight:700; letter-spacing:.12em; text-transform:uppercase; color:var(--accent); }
+  .h2sub { color:var(--muted); font-size:15px; margin:6px 0 26px; font-style:italic; }
+  h3 { font-size:17px; font-weight:600; margin:24px 0 6px; }
+  section p { color:var(--muted); margin-bottom:14px; } section p b, li b { color:var(--text); font-weight:600; }
 
-  ul.feat { list-style:none; display:flex; flex-direction:column; gap:14px; }
-  ul.feat li { color:var(--muted); padding-left:22px; position:relative; }
-  ul.feat li::before { content:"›"; position:absolute; left:0; color:var(--accent); font-family:var(--mono); font-weight:700; }
+  /* feature cards — 3 col */
+  .cards { display:grid; grid-template-columns:repeat(3,1fr); gap:1px; background:var(--line); border:1px solid var(--line); border-radius:12px; overflow:hidden; }
+  .card { background:var(--panel); padding:26px 24px; }
+  .card .n { font-family:var(--mono); font-size:12px; color:var(--amber); } .card h4 { font-size:17px; font-weight:700; margin:10px 0 8px; }
+  .card p { font-size:14.5px; margin:0; }
 
+  /* install 2-col */
+  .split { display:grid; grid-template-columns:1fr 1fr; gap:40px; align-items:start; }
   pre { background:var(--code); border:1px solid var(--line); border-radius:8px; padding:16px 18px; overflow-x:auto; font-family:var(--mono); font-size:13.5px; line-height:1.7; margin:6px 0 16px; color:var(--text); }
   pre .c { color:var(--dim); } pre .k { color:var(--link); } pre .s { color:var(--green); } pre .n { color:var(--accent); }
+  ol.steps { list-style:none; counter-reset:s; display:flex; flex-direction:column; gap:18px; margin-top:8px; }
+  ol.steps li { counter-increment:s; padding-left:38px; position:relative; color:var(--muted); font-size:14.5px; }
+  ol.steps li::before { content:counter(s); position:absolute; left:0; top:0; width:24px; height:24px; border:1px solid var(--line); border-radius:6px; color:var(--accent); font-family:var(--mono); font-size:13px; font-weight:700; display:grid; place-items:center; }
+  ol.steps b { color:var(--text); }
 
   table { width:100%; border-collapse:collapse; margin:6px 0 8px; font-size:14.5px; }
   th, td { text-align:left; padding:10px 12px; border-bottom:1px solid var(--line); vertical-align:top; }
-  th { color:var(--muted); font-weight:500; font-size:13px; }
-  td:first-child { white-space:nowrap; } td code { color:var(--accent); }
+  th { color:var(--muted); font-weight:500; font-size:13px; } td:first-child { white-space:nowrap; } td code { color:var(--accent); }
+  .cfg-grid { display:grid; grid-template-columns:1fr 1fr; gap:40px; align-items:start; }
 
-  footer { border-top:1px solid var(--line); padding:30px 0 50px; color:var(--muted); font-size:13.5px; }
+  footer { border-top:1px solid var(--line); padding:32px 0 56px; color:var(--muted); font-size:13.5px; }
   .foot { display:flex; flex-wrap:wrap; gap:16px; justify-content:space-between; }
-  .disclaimer { margin-top:14px; color:var(--dim); font-size:12.5px; font-style:italic; }
+  .disclaimer { margin-top:14px; color:var(--dim); font-size:12.5px; font-style:italic; max-width:70ch; }
 
+  @media (max-width:900px) {
+    .hero__grid { grid-template-columns:1fr; gap:34px; }
+    .cards { grid-template-columns:1fr; }
+    .split, .cfg-grid { grid-template-columns:1fr; gap:24px; }
+  }
   @media (max-width:560px) { .nav a.hide, .navclock { display:none; } }
   @media (prefers-reduced-motion:reduce) {
-    .ticker__track, .eyebrow::before, .wait .dot { animation:none !important; }
+    .band__track, .monitor__foot .t, .eyebrow::before, .wait .dot { animation:none !important; }
     html { scroll-behavior:auto; }
   }
 </style>
@@ -153,71 +148,88 @@
   </span>
 </div></nav>
 
+<!-- full-width lobby ticker -->
+<div class="band bleed"><div class="band__track" id="band"></div></div>
+
 <div class="wrap">
-  <header>
-    <span class="eyebrow">Ambient display for Claude Code</span>
-    <h1>While Claude works, you wait. Might as well check the <b>score</b>.</h1>
-    <p class="tagline">claudebar turns the bottom of your terminal into a <b>waiting-room monitor</b> — news, football, the live World Cup, and the time — quietly running while the agent does the actual heavy lifting.</p>
-    <p class="aside">You know the screen above the elevator. The one in the dentist's lobby. Now it's under your prompt.</p>
+  <section class="hero">
+    <div class="hero__grid">
+      <div>
+        <span class="eyebrow">Now showing · Gate 1 · Claude Code</span>
+        <h1>While Claude thinks,<br>you watch the <span class="y">news</span>.</h1>
+        <p class="tagline">claudebar is the <b>waiting-room monitor</b> for your terminal — news, football, the live World Cup, and the time, scrolling along the bottom of Claude Code while the robot earns its keep.</p>
+        <p class="aside">You know the screen above the elevator. The one in the dentist's lobby. Now it reports to <code>~/.claude/settings.json</code>.</p>
+        <div class="cta">
+          <div class="install"><span class="p">$</span><code id="cmd">npm install -g github:gomeslucasm/claudebar</code><button class="copy" data-src="cmd" aria-label="Copy install command">copy</button></div>
+          <a class="gh" href="https://github.com/gomeslucasm/claudebar">GitHub →</a>
+        </div>
+      </div>
 
-    <!-- the lobby monitor -->
-    <div class="monitor" aria-label="A mock waiting-room display showing rotating headlines and scores">
-      <div class="monitor__head">
-        <span class="now">NOW SHOWING</span>
-        <span class="clock" id="clock">--:--:--</span>
+      <div class="monitor" aria-label="A mock waiting-room display showing rotating headlines and scores">
+        <div class="monitor__head">
+          <span class="now">NOW SHOWING</span>
+          <span><span class="gate">GATE 1&nbsp;&nbsp;</span><span class="clock" id="clock">--:--:--</span></span>
+        </div>
+        <div class="monitor__screen">
+          <div class="panel" id="panel">&nbsp;</div>
+          <div class="wait">your agent is thinking<span class="dot">.</span><span class="dot">.</span><span class="dot">.</span> · you've been waiting <span class="t" id="waited">00:00</span></div>
+        </div>
+        <div class="monitor__foot"><div class="t" id="mfoot"></div></div>
       </div>
-      <div class="monitor__screen">
-        <div class="panel" id="panel">&nbsp;</div>
-        <div class="wait">your agent is thinking<span class="dot">.</span><span class="dot">.</span><span class="dot">.</span> please remain seated</div>
-      </div>
-      <div class="ticker"><div class="ticker__track" id="ticker"></div></div>
     </div>
-
-    <div class="cta">
-      <div class="install">
-        <span class="p">$</span>
-        <code id="cmd">npm install -g github:gomeslucasm/claudebar</code>
-        <button class="copy" id="copy" aria-label="Copy install command">copy</button>
-      </div>
-      <a class="gh" href="https://github.com/gomeslucasm/claudebar">GitHub →</a>
-    </div>
-
-    <figure>
-      <img src="screenshot.png" alt="claudebar showing three rows at the bottom of Claude Code: a news headline, a finished World Cup match with every scorer named, and a football headline." loading="lazy" />
-      <figcaption>The real thing: three rows under a live session — news, a 5×0 with every scorer named, and football. The bottom row is your untouched Claude Code status line.</figcaption>
-    </figure>
-  </header>
+  </section>
 </div>
+
+<div class="shotband bleed"><div class="wrap">
+  <figure>
+    <img src="screenshot.png" alt="claudebar showing three rows at the bottom of Claude Code: a news headline, a finished World Cup match with every scorer named, and a football headline." loading="lazy" />
+    <figcaption>The real thing — three rows under a live session: news, a 5×0 with every scorer named, and football. The bottom row is your untouched Claude Code status line, still doing real work.</figcaption>
+  </figure>
+</div></div>
 
 <div class="wrap">
 
   <section>
-    <h2>What it does</h2>
-    <p class="h2sub">Like the screen above an elevator, but it answers to <code>~/.claude/settings.json</code>.</p>
-    <ul class="feat">
-      <li><b>Stacks widgets into rows.</b> Each row cycles through its items every few seconds — news, football, the live World Cup scoreboard (with scorers next to each team).</li>
-      <li><b>Keeps your current status line.</b> Wrap <code>ccstatusline</code> or any command and run it as one of the rows. Your real bar still does its job; the entertainment just sits next to it.</li>
-      <li><b>Switches with profiles.</b> A profile is a named set of rows. Change it by hand, or have it switch automatically at set times — coffee-break programming.</li>
-    </ul>
+    <p class="h2">What it does</p>
+    <p class="h2sub">Like the screen above an elevator, but it answers to a config file.</p>
+    <div class="cards">
+      <div class="card">
+        <span class="n">01</span>
+        <h4>Stacks widgets into rows</h4>
+        <p>Each row cycles through its items every few seconds — news, football, the live World Cup scoreboard, with scorers next to each team.</p>
+      </div>
+      <div class="card">
+        <span class="n">02</span>
+        <h4>Keeps your status line</h4>
+        <p>Wrap <code>ccstatusline</code> or any command and run it as one of the rows. Your real bar keeps working; the entertainment just sits next to it.</p>
+      </div>
+      <div class="card">
+        <span class="n">03</span>
+        <h4>Switches with profiles</h4>
+        <p>A profile is a named set of rows. Flip it by hand, or have it switch automatically by time of day. Call it coffee-break programming.</p>
+      </div>
+    </div>
   </section>
 
   <section id="install">
-    <h2>Install</h2>
+    <p class="h2">Install</p>
     <p class="h2sub">Two commands and a restart. No remote control required.</p>
-    <p>Requires Node.js 18+ and Claude Code. Install straight from GitHub — it builds itself:</p>
-    <div class="install" style="margin:6px 0 16px">
-      <span class="p">$</span>
-      <code id="cmd2">npm install -g github:gomeslucasm/claudebar</code>
-      <button class="copy" data-src="cmd2" aria-label="Copy install command">copy</button>
+    <div class="split">
+      <div>
+        <p>Requires Node.js 18+ and Claude Code. Install straight from GitHub — it builds itself:</p>
+        <div class="install" style="margin:6px 0 18px"><span class="p">$</span><code id="cmd2">npm install -g github:gomeslucasm/claudebar</code><button class="copy" data-src="cmd2" aria-label="Copy install command">copy</button></div>
+        <ol class="steps">
+          <li><b>Run <code>claudebar init</code>.</b> The wizard builds your profiles and writes the <code>statusLine</code> hook into <code>~/.claude/settings.json</code>.</li>
+          <li><b>Restart Claude Code.</b> The bar appears at the bottom. Please mind the closing brackets.</li>
+          <li><b>Update later</b> by running the install command again.</li>
+        </ol>
+      </div>
+      <figure><img src="setup.gif" alt="The claudebar init wizard: choosing language, naming a profile, and building each line." loading="lazy" /><figcaption>claudebar init — pick a language, name a profile, build each row.</figcaption></figure>
     </div>
-    <p>Then run the interactive setup. It writes the <code>statusLine</code> hook into <code>~/.claude/settings.json</code> for you:</p>
-    <pre><span style="color:var(--accent)">$</span> claudebar init</pre>
-    <figure style="margin:6px 0 16px"><img src="setup.gif" alt="The claudebar init wizard: choosing language, naming a profile, and building each line." loading="lazy" /></figure>
-    <p>Restart Claude Code and the bar appears. To update later, run the install command again.</p>
   </section>
 
   <section id="configure">
-    <h2>Configure</h2>
+    <p class="h2">Configure</p>
     <p class="h2sub">What plays, where, and when.</p>
     <p><code>claudebar init</code> covers everything below interactively. You can also edit <code>~/.claudebar/config.json</code> directly.</p>
 
@@ -231,23 +243,38 @@
       <tr><td><code>passthrough</code></td><td>Runs any command and shows its output verbatim. Takes a row to itself.</td></tr>
     </table>
 
-    <h3>Profiles</h3>
-    <p>A profile is a complete, named set of rows — e.g. <code>default</code> and <code>matchday</code>. Switch by hand at any time:</p>
-    <pre><span class="n">claudebar</span> profile            <span class="c"># list profiles, marks the active one</span>
+    <div class="cfg-grid" style="margin-top:8px">
+      <div>
+        <h3>Profiles</h3>
+        <p>A profile is a complete, named set of rows — e.g. <code>default</code> and <code>matchday</code>. Switch by hand at any time:</p>
+        <pre><span class="n">claudebar</span> profile            <span class="c"># list, marks the active one</span>
 <span class="n">claudebar</span> profile use matchday</pre>
-    <p>Or schedule switches by time of day. Each <code>switch</code> flips the active profile at a wall-clock time; a manual switch holds until the next scheduled one. Windows wrap past midnight.</p>
-
-    <h3>config.json</h3>
-    <pre>{
+        <p>Or schedule switches by time of day. Each <code>switch</code> flips the active profile at a wall-clock time; a manual switch holds until the next scheduled one. Windows wrap past midnight.</p>
+        <h3>Commands</h3>
+        <table>
+          <tr><td><code>claudebar init</code></td><td>Interactive setup.</td></tr>
+          <tr><td><code>claudebar run</code></td><td>Render the rows once.</td></tr>
+          <tr><td><code>claudebar profile</code></td><td>List profiles.</td></tr>
+          <tr><td><code>claudebar profile use &lt;name&gt;</code></td><td>Switch profile.</td></tr>
+        </table>
+      </div>
+      <div>
+        <h3>config.json</h3>
+        <pre>{
   <span class="k">"activeProfile"</span>: <span class="s">"default"</span>,
   <span class="k">"profiles"</span>: {
     <span class="k">"default"</span>: [
-      [{ <span class="k">"widget"</span>: <span class="s">"passthrough"</span>, <span class="k">"command"</span>: <span class="s">"npx -y ccstatusline@latest"</span> }],
-      [{ <span class="k">"widget"</span>: <span class="s">"news"</span>, <span class="k">"sources"</span>: [<span class="s">"HN"</span>, <span class="s">"TechCrunch"</span>], <span class="k">"interval"</span>: <span class="n">10</span> }]
+      [{ <span class="k">"widget"</span>: <span class="s">"passthrough"</span>,
+         <span class="k">"command"</span>: <span class="s">"npx -y ccstatusline@latest"</span> }],
+      [{ <span class="k">"widget"</span>: <span class="s">"news"</span>,
+         <span class="k">"sources"</span>: [<span class="s">"HN"</span>, <span class="s">"TechCrunch"</span>],
+         <span class="k">"interval"</span>: <span class="n">10</span> }]
     ],
     <span class="k">"matchday"</span>: [
       [{ <span class="k">"widget"</span>: <span class="s">"worldcup"</span>, <span class="k">"interval"</span>: <span class="n">8</span> }],
-      [{ <span class="k">"widget"</span>: <span class="s">"soccer"</span>, <span class="k">"sources"</span>: [<span class="s">"GloboEsporte"</span>], <span class="k">"interval"</span>: <span class="n">10</span> }]
+      [{ <span class="k">"widget"</span>: <span class="s">"soccer"</span>,
+         <span class="k">"sources"</span>: [<span class="s">"GloboEsporte"</span>],
+         <span class="k">"interval"</span>: <span class="n">10</span> }]
     ]
   },
   <span class="k">"switches"</span>: [
@@ -255,67 +282,59 @@
     { <span class="k">"at"</span>: <span class="s">"23:00"</span>, <span class="k">"profile"</span>: <span class="s">"default"</span> }
   ]
 }</pre>
-
-    <h3>Commands</h3>
-    <table>
-      <tr><td><code>claudebar init</code></td><td>Interactive setup.</td></tr>
-      <tr><td><code>claudebar run</code></td><td>Render the rows once — what Claude Code calls on each refresh.</td></tr>
-      <tr><td><code>claudebar profile</code></td><td>List profiles, marking the active one.</td></tr>
-      <tr><td><code>claudebar profile use &lt;name&gt;</code></td><td>Switch profile until the next scheduled switch.</td></tr>
-    </table>
+      </div>
+    </div>
   </section>
 
 </div>
 
 <footer><div class="wrap">
   <div class="foot">
-    <span>MIT · Node 18+</span>
+    <span>MIT · Node 18+ · made for waiting</span>
     <a href="https://github.com/gomeslucasm/claudebar">github.com/gomeslucasm/claudebar</a>
   </div>
-  <p class="disclaimer">claudebar accepts no liability for goals missed during long compiles, or for catching up on the news instead of the stack trace.</p>
+  <p class="disclaimer">claudebar accepts no liability for goals missed during long compiles, news read instead of stack traces, or the creeping suspicion that the elevator screen was the best part of the building.</p>
 </div></footer>
 
 <script>
-  // live clock — the one honest thing on a lobby display
   function pad(n){ return String(n).padStart(2,"0"); }
+  var start = Date.now();
   function tick() {
     var d = new Date();
     var hms = pad(d.getHours())+":"+pad(d.getMinutes())+":"+pad(d.getSeconds());
-    var c = document.getElementById("clock"); if (c) c.textContent = hms;
-    var nc = document.getElementById("navclock"); if (nc) nc.textContent = hms.slice(0,5);
+    var c=document.getElementById("clock"); if(c) c.textContent=hms;
+    var nc=document.getElementById("navclock"); if(nc) nc.textContent=hms.slice(0,5);
+    var w=document.getElementById("waited"); if(w){ var s=Math.floor((Date.now()-start)/1000); w.textContent=pad(Math.floor(s/60))+":"+pad(s%60); }
   }
   tick(); setInterval(tick, 1000);
 
-  // rotating "now showing" panel
+  var reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   var items = [
     'FT  Portugal <span class="sc">5 × 0</span> Uzbekistan  <span class="small">· every scorer named</span>',
     '<span class="tag">[HN]</span> Show HN: I watch the news inside my terminal now',
     '<span class="live">🔴 LIVE 63\'</span>  Brazil <span class="sc">2 × 1</span> Croatia',
     '<span class="tag">[The Verge]</span> Developer ships feature, misses the entire second half',
-    '<span class="ft">FT</span>  the build  <span class="sc">0 × 0</span>  your patience  <span class="small">· still running</span>'
+    '<span class="ft">FT</span>  the build <span class="sc">0 × 0</span> your patience  <span class="small">· still running</span>',
+    '<span class="tag">[Weather]</span> Cloudy with a chance of merge conflicts'
   ];
-  var reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-  var panel = document.getElementById("panel");
-  var i = 0;
-  function show(){ panel.innerHTML = items[i % items.length]; i++; }
-  show();
-  if (!reduce) setInterval(show, 3400);
+  var panel=document.getElementById("panel"), i=0;
+  function show(){ panel.innerHTML=items[i%items.length]; i++; }
+  show(); if(!reduce) setInterval(show, 3800);
 
-  // scrolling ticker (content duplicated so the marquee loops seamlessly)
-  var feed = ['<span class="b">BREAKING</span> your compile is still running',
-    'Portugal lead at the half', 'HN front page just refreshed',
-    'the agent is thinking', 'do not adjust your terminal',
-    'World Cup live · 4 matches today', 'coffee is ready in the break room'];
-  var line = feed.map(function(t){ return '<span>'+t+'</span>'; }).join('<span>·</span>');
-  document.getElementById("ticker").innerHTML = line + '<span>·</span>' + line;
+  // tickers (duplicated for seamless loop)
+  function fill(el, arr){ var line=arr.join('<span>·</span>'); el.innerHTML='<span>'+line+'</span><span>·</span><span>'+line+'</span>'; }
+  fill(document.getElementById("band"), [
+    '<span class="b">NOW SERVING</span> ticket #402','your compile is still running',
+    'Portugal lead at the half','<span class="x">please mind the closing brackets</span>',
+    'free coffee in the break room','do not feed the linter',
+    'the agent will be with you shortly','World Cup · 4 matches today']);
+  fill(document.getElementById("mfoot"), ['updated just now','source: ESPN · RSS','no flights delayed','thank you for waiting']);
 
-  // copy buttons
   document.querySelectorAll(".copy").forEach(function(btn){
     btn.addEventListener("click", function(){
-      var src = btn.dataset.src || "cmd";
-      navigator.clipboard.writeText(document.getElementById(src).textContent).then(function(){
-        var t = btn.textContent; btn.textContent = "copied"; btn.classList.add("ok");
-        setTimeout(function(){ btn.textContent = t; btn.classList.remove("ok"); }, 1500);
+      navigator.clipboard.writeText(document.getElementById(btn.dataset.src).textContent).then(function(){
+        var t=btn.textContent; btn.textContent="copied"; btn.classList.add("ok");
+        setTimeout(function(){ btn.textContent=t; btn.classList.remove("ok"); },1500);
       });
     });
   });
