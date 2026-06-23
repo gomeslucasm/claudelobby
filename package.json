@@ -1,10 +1,10 @@
 {
-  "name": "claudebar",
+  "name": "claudelobby",
   "version": "0.1.0",
   "description": "Multi-line status bar compositor for Claude Code with widgets and time-based schedules",
   "type": "module",
   "bin": {
-    "claudebar": "./dist/cli/index.js"
+    "claudelobby": "./dist/cli/index.js"
   },
   "scripts": {
     "build": "tsc",
@@ -21,7 +21,7 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/gomeslucasm/claudebar.git"
+    "url": "git+https://github.com/gomeslucasm/claudelobby.git"
   },
   "dependencies": {
     "@clack/prompts": "^1.6.0",

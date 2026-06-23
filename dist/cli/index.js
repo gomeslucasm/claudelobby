@@ -14,7 +14,7 @@ switch (cmd) {
         profile(process.argv.slice(3)).catch(e => { console.error(e); process.exit(1); });
         break;
     default:
-        console.log(`claudebar <command>
+        console.log(`claudelobby <command>
 
   init                              Interactive setup
   run                               Render and print the status bar lines

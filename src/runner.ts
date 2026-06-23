@@ -55,7 +55,7 @@ async function readStdin(): Promise<string> {
 export async function run(): Promise<void> {
   const config = loadConfig();
   if (!config) {
-    console.log('claudebar: not configured. Run: claudebar init');
+    console.log('claudelobby: not configured. Run: claudelobby init');
     return;
   }
 

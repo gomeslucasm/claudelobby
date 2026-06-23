@@ -23,7 +23,7 @@ function normTime(t: string): string {
 
 export async function profile(args: string[]): Promise<void> {
   const config = loadConfig();
-  if (!config) { console.log('claudebar: not configured. Run: claudebar init'); return; }
+  if (!config) { console.log('claudelobby: not configured. Run: claudelobby init'); return; }
   const m = messages(config.lang);
   const names = () => Object.keys(config.profiles);
   const sub = args[0] ?? 'list';
@@ -34,7 +34,7 @@ export async function profile(args: string[]): Promise<void> {
   // ── use ──
   if (sub === 'use') {
     const name = args[1];
-    if (!name) { console.log('Usage: claudebar profile use <name>'); process.exit(1); }
+    if (!name) { console.log('Usage: claudelobby profile use <name>'); process.exit(1); }
     if (!config.profiles[name]) { console.log(m.pm.unknown(name, names().join(', '))); process.exit(1); }
     useProfile(config, name);
     saveConfig(config);
@@ -68,7 +68,7 @@ export async function profile(args: string[]): Promise<void> {
   // ── edit ──
   if (sub === 'edit') {
     const name = args[1];
-    if (!name) { console.log('Usage: claudebar profile edit <name>'); process.exit(1); }
+    if (!name) { console.log('Usage: claudelobby profile edit <name>'); process.exit(1); }
     if (!config.profiles[name]) { console.log(m.pm.unknown(name, names().join(', '))); process.exit(1); }
     p.intro(m.pm.editIntro(name));
     config.profiles[name] = await configureLines(m, detectExistingStatusLine());
@@ -80,7 +80,7 @@ export async function profile(args: string[]): Promise<void> {
   // ── remove / rm / delete ──
   if (sub === 'remove' || sub === 'rm' || sub === 'delete') {
     const name = args[1];
-    if (!name) { console.log('Usage: claudebar profile remove <name>'); process.exit(1); }
+    if (!name) { console.log('Usage: claudelobby profile remove <name>'); process.exit(1); }
     if (!config.profiles[name]) { console.log(m.pm.unknown(name, names().join(', '))); process.exit(1); }
     if (names().length <= 1) { console.log(m.pm.cannotRemoveLast); process.exit(1); }
 
@@ -107,7 +107,7 @@ export async function profile(args: string[]): Promise<void> {
     const action = args[1];
     if (action === 'add') {
       const rawTime = args[2], prof = args[3];
-      if (!rawTime || !prof) { console.log('Usage: claudebar profile switch add <HH:MM> <profile>'); process.exit(1); }
+      if (!rawTime || !prof) { console.log('Usage: claudelobby profile switch add <HH:MM> <profile>'); process.exit(1); }
       if (!isValidTime(rawTime)) { console.log(m.pm.badTime); process.exit(1); }
       if (!config.profiles[prof]) { console.log(m.pm.unknown(prof, names().join(', '))); process.exit(1); }
       const at = normTime(rawTime);
@@ -120,7 +120,7 @@ export async function profile(args: string[]): Promise<void> {
     }
     if (action === 'remove' || action === 'rm' || action === 'delete') {
       const rawTime = args[2];
-      if (!rawTime) { console.log('Usage: claudebar profile switch remove <HH:MM>'); process.exit(1); }
+      if (!rawTime) { console.log('Usage: claudelobby profile switch remove <HH:MM>'); process.exit(1); }
       const at = isValidTime(rawTime) ? normTime(rawTime) : rawTime;
       const before = config.switches?.length ?? 0;
       config.switches = (config.switches ?? []).filter(s => s.at !== at);
@@ -128,7 +128,7 @@ export async function profile(args: string[]): Promise<void> {
       console.log(before === config.switches.length ? m.pm.switchNone(at) : m.pm.switchRemoved(at));
       return;
     }
-    console.log('Usage: claudebar profile switch add <HH:MM> <profile> | remove <HH:MM>');
+    console.log('Usage: claudelobby profile switch add <HH:MM> <profile> | remove <HH:MM>');
     process.exit(1);
   }
 

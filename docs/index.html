@@ -3,9 +3,9 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>claudebar — the waiting-room display for Claude Code</title>
-<meta name="description" content="claudebar turns the bottom of your terminal into a waiting-room monitor — news, football, the live World Cup, and the time — running while Claude Code does the work." />
-<meta property="og:title" content="claudebar" />
+<title>claudelobby — the waiting-room display for Claude Code</title>
+<meta name="description" content="claudelobby turns the bottom of your terminal into a waiting-room monitor — news, football, the live World Cup, and the time — running while Claude Code does the work." />
+<meta property="og:title" content="claudelobby" />
 <meta property="og:description" content="While Claude thinks, you watch the news. The waiting-room display for your terminal." />
 <meta property="og:image" content="screenshot.png" />
 <meta name="theme-color" content="#0b0b10" />
@@ -139,12 +139,12 @@
 <body>
 
 <nav><div class="wrap nav">
-  <span class="brand">claude<b>bar</b></span>
+  <span class="brand">claude<b>lobby</b></span>
   <span class="right">
     <span class="navclock" id="navclock">--:--</span>
     <a class="hide" href="#install">Install</a>
     <a class="hide" href="#configure">Configure</a>
-    <a href="https://github.com/gomeslucasm/claudebar">GitHub</a>
+    <a href="https://github.com/gomeslucasm/claudelobby">GitHub</a>
   </span>
 </div></nav>
 
@@ -157,11 +157,11 @@
       <div>
         <span class="eyebrow">Now showing · Gate 1 · Claude Code</span>
         <h1>While Claude thinks,<br>you watch the <span class="y">news</span>.</h1>
-        <p class="tagline">claudebar is the <b>waiting-room monitor</b> for your terminal — news, football, the live World Cup, and the time, scrolling along the bottom of Claude Code while the robot earns its keep.</p>
+        <p class="tagline">claudelobby is the <b>waiting-room monitor</b> for your terminal — news, football, the live World Cup, and the time, scrolling along the bottom of Claude Code while the robot earns its keep.</p>
         <p class="aside">You know the screen above the elevator. The one in the dentist's lobby. Now it reports to <code>~/.claude/settings.json</code>.</p>
         <div class="cta">
-          <div class="install"><span class="p">$</span><code id="cmd">npm install -g github:gomeslucasm/claudebar</code><button class="copy" data-src="cmd" aria-label="Copy install command">copy</button></div>
-          <a class="gh" href="https://github.com/gomeslucasm/claudebar">GitHub →</a>
+          <div class="install"><span class="p">$</span><code id="cmd">npm install -g github:gomeslucasm/claudelobby</code><button class="copy" data-src="cmd" aria-label="Copy install command">copy</button></div>
+          <a class="gh" href="https://github.com/gomeslucasm/claudelobby">GitHub →</a>
         </div>
       </div>
 
@@ -182,7 +182,7 @@
 
 <div class="shotband bleed"><div class="wrap">
   <figure>
-    <img src="screenshot.png" alt="claudebar showing three rows at the bottom of Claude Code: a news headline, a finished World Cup match with every scorer named, and a football headline." loading="lazy" />
+    <img src="screenshot.png" alt="claudelobby showing three rows at the bottom of Claude Code: a news headline, a finished World Cup match with every scorer named, and a football headline." loading="lazy" />
     <figcaption>The real thing — three rows under a live session: news, a 5×0 with every scorer named, and football. The bottom row is your untouched Claude Code status line, still doing real work.</figcaption>
   </figure>
 </div></div>
@@ -217,21 +217,21 @@
     <div class="split">
       <div>
         <p>Requires Node.js 18+ and Claude Code. Install straight from GitHub — it builds itself:</p>
-        <div class="install" style="margin:6px 0 18px"><span class="p">$</span><code id="cmd2">npm install -g github:gomeslucasm/claudebar</code><button class="copy" data-src="cmd2" aria-label="Copy install command">copy</button></div>
+        <div class="install" style="margin:6px 0 18px"><span class="p">$</span><code id="cmd2">npm install -g github:gomeslucasm/claudelobby</code><button class="copy" data-src="cmd2" aria-label="Copy install command">copy</button></div>
         <ol class="steps">
-          <li><b>Run <code>claudebar init</code>.</b> The wizard builds your profiles and writes the <code>statusLine</code> hook into <code>~/.claude/settings.json</code>.</li>
+          <li><b>Run <code>claudelobby init</code>.</b> The wizard builds your profiles and writes the <code>statusLine</code> hook into <code>~/.claude/settings.json</code>.</li>
           <li><b>Restart Claude Code.</b> The bar appears at the bottom. Please mind the closing brackets.</li>
           <li><b>Update later</b> by running the install command again.</li>
         </ol>
       </div>
-      <figure><img src="setup.gif" alt="The claudebar init wizard: choosing language, naming a profile, and building each line." loading="lazy" /><figcaption>claudebar init — pick a language, name a profile, build each row.</figcaption></figure>
+      <figure><img src="setup.gif" alt="The claudelobby init wizard: choosing language, naming a profile, and building each line." loading="lazy" /><figcaption>claudelobby init — pick a language, name a profile, build each row.</figcaption></figure>
     </div>
   </section>
 
   <section id="configure">
     <p class="h2">Configure</p>
     <p class="h2sub">What plays, where, and when.</p>
-    <p><code>claudebar init</code> covers everything below interactively. You can also edit <code>~/.claudebar/config.json</code> directly.</p>
+    <p><code>claudelobby init</code> covers everything below interactively. You can also edit <code>~/.claudelobby/config.json</code> directly.</p>
 
     <h3>Rows &amp; widgets</h3>
     <p>A row is one or more widgets that rotate together. You pick the seconds-per-item for each.</p>
@@ -247,22 +247,22 @@
       <div>
         <h3>Profiles</h3>
         <p>A profile is a complete, named set of rows — e.g. <code>default</code> and <code>matchday</code>. Manage them from the CLI, no need to re-run <code>init</code>:</p>
-        <pre><span class="n">claudebar</span> profile                 <span class="c"># list, marks the active one</span>
-<span class="n">claudebar</span> profile use matchday    <span class="c"># switch by hand</span>
-<span class="n">claudebar</span> profile add matchday    <span class="c"># build a new profile</span>
-<span class="n">claudebar</span> profile edit default    <span class="c"># rebuild its rows</span>
-<span class="n">claudebar</span> profile remove matchday <span class="c"># delete (rm, delete)</span></pre>
+        <pre><span class="n">claudelobby</span> profile                 <span class="c"># list, marks the active one</span>
+<span class="n">claudelobby</span> profile use matchday    <span class="c"># switch by hand</span>
+<span class="n">claudelobby</span> profile add matchday    <span class="c"># build a new profile</span>
+<span class="n">claudelobby</span> profile edit default    <span class="c"># rebuild its rows</span>
+<span class="n">claudelobby</span> profile remove matchday <span class="c"># delete (rm, delete)</span></pre>
         <p>Or schedule switches by time of day. Each <code>switch</code> flips the active profile at a wall-clock time; a manual switch holds until the next scheduled one. Windows wrap past midnight.</p>
-        <pre><span class="n">claudebar</span> profile switch add 18:00 matchday
-<span class="n">claudebar</span> profile switch remove 18:00</pre>
+        <pre><span class="n">claudelobby</span> profile switch add 18:00 matchday
+<span class="n">claudelobby</span> profile switch remove 18:00</pre>
         <h3>Commands</h3>
         <table>
-          <tr><td><code>claudebar init</code></td><td>Interactive setup.</td></tr>
-          <tr><td><code>claudebar run</code></td><td>Render the rows once.</td></tr>
-          <tr><td><code>claudebar profile</code></td><td>List profiles.</td></tr>
-          <tr><td><code>claudebar profile use &lt;name&gt;</code></td><td>Switch by hand.</td></tr>
-          <tr><td><code>claudebar profile add / edit / remove</code></td><td>Manage profiles.</td></tr>
-          <tr><td><code>claudebar profile switch add / remove</code></td><td>Schedule switches.</td></tr>
+          <tr><td><code>claudelobby init</code></td><td>Interactive setup.</td></tr>
+          <tr><td><code>claudelobby run</code></td><td>Render the rows once.</td></tr>
+          <tr><td><code>claudelobby profile</code></td><td>List profiles.</td></tr>
+          <tr><td><code>claudelobby profile use &lt;name&gt;</code></td><td>Switch by hand.</td></tr>
+          <tr><td><code>claudelobby profile add / edit / remove</code></td><td>Manage profiles.</td></tr>
+          <tr><td><code>claudelobby profile switch add / remove</code></td><td>Schedule switches.</td></tr>
         </table>
       </div>
       <div>
@@ -298,9 +298,9 @@
 <footer><div class="wrap">
   <div class="foot">
     <span>MIT · Node 18+ · made for waiting</span>
-    <a href="https://github.com/gomeslucasm/claudebar">github.com/gomeslucasm/claudebar</a>
+    <a href="https://github.com/gomeslucasm/claudelobby">github.com/gomeslucasm/claudelobby</a>
   </div>
-  <p class="disclaimer">claudebar accepts no liability for goals missed during long compiles, news read instead of stack traces, or the creeping suspicion that the elevator screen was the best part of the building.</p>
+  <p class="disclaimer">claudelobby accepts no liability for goals missed during long compiles, news read instead of stack traces, or the creeping suspicion that the elevator screen was the best part of the building.</p>
 </div></footer>
 
 <script>

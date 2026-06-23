@@ -20,7 +20,7 @@ function normTime(t) {
 export async function profile(args) {
     const config = loadConfig();
     if (!config) {
-        console.log('claudebar: not configured. Run: claudebar init');
+        console.log('claudelobby: not configured. Run: claudelobby init');
         return;
     }
     const m = messages(config.lang);
@@ -35,7 +35,7 @@ export async function profile(args) {
     if (sub === 'use') {
         const name = args[1];
         if (!name) {
-            console.log('Usage: claudebar profile use <name>');
+            console.log('Usage: claudelobby profile use <name>');
             process.exit(1);
         }
         if (!config.profiles[name]) {
@@ -80,7 +80,7 @@ export async function profile(args) {
     if (sub === 'edit') {
         const name = args[1];
         if (!name) {
-            console.log('Usage: claudebar profile edit <name>');
+            console.log('Usage: claudelobby profile edit <name>');
             process.exit(1);
         }
         if (!config.profiles[name]) {
@@ -97,7 +97,7 @@ export async function profile(args) {
     if (sub === 'remove' || sub === 'rm' || sub === 'delete') {
         const name = args[1];
         if (!name) {
-            console.log('Usage: claudebar profile remove <name>');
+            console.log('Usage: claudelobby profile remove <name>');
             process.exit(1);
         }
         if (!config.profiles[name]) {
@@ -135,7 +135,7 @@ export async function profile(args) {
         if (action === 'add') {
             const rawTime = args[2], prof = args[3];
             if (!rawTime || !prof) {
-                console.log('Usage: claudebar profile switch add <HH:MM> <profile>');
+                console.log('Usage: claudelobby profile switch add <HH:MM> <profile>');
                 process.exit(1);
             }
             if (!isValidTime(rawTime)) {
@@ -157,7 +157,7 @@ export async function profile(args) {
         if (action === 'remove' || action === 'rm' || action === 'delete') {
             const rawTime = args[2];
             if (!rawTime) {
-                console.log('Usage: claudebar profile switch remove <HH:MM>');
+                console.log('Usage: claudelobby profile switch remove <HH:MM>');
                 process.exit(1);
             }
             const at = isValidTime(rawTime) ? normTime(rawTime) : rawTime;
@@ -167,7 +167,7 @@ export async function profile(args) {
             console.log(before === config.switches.length ? m.pm.switchNone(at) : m.pm.switchRemoved(at));
             return;
         }
-        console.log('Usage: claudebar profile switch add <HH:MM> <profile> | remove <HH:MM>');
+        console.log('Usage: claudelobby profile switch add <HH:MM> <profile> | remove <HH:MM>');
         process.exit(1);
     }
     // ── list (default) ──

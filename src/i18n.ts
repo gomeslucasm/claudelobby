@@ -66,7 +66,7 @@ export interface Messages {
 }
 
 const en: Messages = {
-  intro: 'claudebar — status bar compositor',
+  intro: 'claudelobby — status bar compositor',
   overwrite: 'Config already exists. Overwrite?',
   cancelled: 'Cancelled.',
   detected: (name) => `Detected: ${name}`,
@@ -102,7 +102,7 @@ const en: Messages = {
   switchToProfile: 'Switch to which profile?',
   addAnotherSwitch: 'Add another switch?',
   updateSettings: 'Update ~/.claude/settings.json?',
-  done: 'Done!  Config: ~/.claudebar/config.json  |  Try: claudebar run',
+  done: 'Done!  Config: ~/.claudelobby/config.json  |  Try: claudelobby run',
   empty: '(empty)',
   labelNews: (s) => `News (${s})`,
   labelSoccer: (s) => `Football (${s})`,
@@ -111,7 +111,7 @@ const en: Messages = {
   pm: {
     addIntro: 'Add a profile',
     editIntro: (n) => `Edit profile "${n}"`,
-    nameTaken: (n) => `Profile "${n}" already exists. Edit it with: claudebar profile edit ${n}`,
+    nameTaken: (n) => `Profile "${n}" already exists. Edit it with: claudelobby profile edit ${n}`,
     unknown: (n, list) => `Unknown profile "${n}". Available: ${list}`,
     useNow: (n) => `Switch to "${n}" now?`,
     removeConfirm: (n) => `Delete profile "${n}"? This cannot be undone.`,
@@ -128,7 +128,7 @@ const en: Messages = {
 };
 
 const pt: Messages = {
-  intro: 'claudebar — compositor de status bar',
+  intro: 'claudelobby — compositor de status bar',
   overwrite: 'Configuração já existe. Sobrescrever?',
   cancelled: 'Cancelado.',
   detected: (name) => `Detectado: ${name}`,
@@ -164,7 +164,7 @@ const pt: Messages = {
   switchToProfile: 'Trocar para qual profile?',
   addAnotherSwitch: 'Adicionar outra troca?',
   updateSettings: 'Atualizar ~/.claude/settings.json?',
-  done: 'Pronto!  Config: ~/.claudebar/config.json  |  Teste: claudebar run',
+  done: 'Pronto!  Config: ~/.claudelobby/config.json  |  Teste: claudelobby run',
   empty: '(vazia)',
   labelNews: (s) => `Notícias (${s})`,
   labelSoccer: (s) => `Futebol (${s})`,
@@ -173,7 +173,7 @@ const pt: Messages = {
   pm: {
     addIntro: 'Adicionar um profile',
     editIntro: (n) => `Editar profile "${n}"`,
-    nameTaken: (n) => `Profile "${n}" já existe. Edite com: claudebar profile edit ${n}`,
+    nameTaken: (n) => `Profile "${n}" já existe. Edite com: claudelobby profile edit ${n}`,
     unknown: (n, list) => `Profile "${n}" não existe. Disponíveis: ${list}`,
     useNow: (n) => `Trocar para "${n}" agora?`,
     removeConfirm: (n) => `Excluir o profile "${n}"? Isso não tem volta.`,

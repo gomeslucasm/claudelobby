@@ -1,7 +1,7 @@
 import { readFileSync, writeFileSync, mkdirSync, existsSync } from 'fs';
 import { homedir } from 'os';
 import { join } from 'path';
-export const CONFIG_DIR = join(homedir(), '.claudebar');
+export const CONFIG_DIR = join(homedir(), '.claudelobby');
 export const CONFIG_FILE = join(CONFIG_DIR, 'config.json');
 export const CLAUDE_SETTINGS = join(homedir(), '.claude', 'settings.json');
 export const CACHE_DIR = join(CONFIG_DIR, 'cache');

@@ -11,7 +11,7 @@ export function detectExistingStatusLine(): DetectedTool | null {
   if (!sl?.command) return null;
 
   const cmd = sl.command as string;
-  if (cmd.includes('claudebar')) return null; // already us
+  if (cmd.includes('claudelobby')) return null; // already us
 
   const name = cmd.includes('ccstatusline') ? 'ccstatusline'
     : cmd.includes('npx') ? 'npx tool'

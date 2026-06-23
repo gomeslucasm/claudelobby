@@ -1,19 +1,19 @@
 <div align="center">
 
-# 🛰️ claudebar
+# 🛰️ claudelobby
 
 **A multi-line, time-aware status bar for [Claude Code](https://claude.com/claude-code).**
 
 Compose widgets — news headlines, football scores, the live World Cup scoreboard —
 into the status line at the bottom of your terminal, and swap what's shown by time of day.
 
-![claudebar running in Claude Code](docs/screenshot.png)
+![claudelobby running in Claude Code](docs/screenshot.png)
 
 </div>
 
 ---
 
-claudebar plugs into Claude Code's `statusLine` hook, so it shows up automatically while you work. Each line **cycles** through its items every few seconds. Already using a status line tool like `ccstatusline`? claudebar keeps it running as one of its lines.
+claudelobby plugs into Claude Code's `statusLine` hook, so it shows up automatically while you work. Each line **cycles** through its items every few seconds. Already using a status line tool like `ccstatusline`? claudelobby keeps it running as one of its lines.
 
 ```text
 [UOL] Sánchez, do Peru, diz que não reconhecerá resultados do segundo turno…  http://spoo.me/…  (8s)
@@ -36,34 +36,34 @@ FT | Portugal (C. Ronaldo 6', N. Mendes 17', C. Ronaldo 39', A. Nematov 60' (gc)
 
 ## 📦 Install
 
-claudebar isn't on npm yet. The simplest way is to install it straight from GitHub:
+claudelobby isn't on npm yet. The simplest way is to install it straight from GitHub:
 
 ```bash
-npm install -g github:gomeslucasm/claudebar
+npm install -g github:gomeslucasm/claudelobby
 ```
 
-That puts the `claudebar` command on your `PATH`. Run the same command again to update. The build output (`dist/`) is committed, so the install needs no compiler and no build step — handy behind locked-down corporate networks.
+That puts the `claudelobby` command on your `PATH`. Run the same command again to update. The build output (`dist/`) is committed, so the install needs no compiler and no build step — handy behind locked-down corporate networks.
 
 <details>
 <summary>Install from a local clone instead</summary>
 
 ```bash
-git clone https://github.com/gomeslucasm/claudebar.git
-cd claudebar
+git clone https://github.com/gomeslucasm/claudelobby.git
+cd claudelobby
 npm install      # runtime deps only
-npm link         # makes the `claudebar` command available globally
+npm link         # makes the `claudelobby` command available globally
 ```
 
-`dist/` ships in the repo, so this works without building. If you change the source, run `npm run build`. If you'd rather not link, call `node /path/to/claudebar/dist/cli/index.js` directly.
+`dist/` ships in the repo, so this works without building. If you change the source, run `npm run build`. If you'd rather not link, call `node /path/to/claudelobby/dist/cli/index.js` directly.
 </details>
 
 ## 🚀 Quick start
 
 ```bash
-claudebar init
+claudelobby init
 ```
 
-![claudebar init walkthrough](docs/setup.gif)
+![claudelobby init walkthrough](docs/setup.gif)
 
 The interactive setup walks you through:
 
@@ -72,7 +72,7 @@ The interactive setup walks you through:
 3. **Switching** *(optional)* — times of day to switch profile automatically.
 4. **Hook up Claude Code** — it offers to write the `statusLine` entry into `~/.claude/settings.json` for you. Say yes and you're done.
 
-Restart Claude Code and the bar appears. If claudebar detects an existing status line tool, it offers to keep it as one of the lines so you don't lose what you had.
+Restart Claude Code and the bar appears. If claudelobby detects an existing status line tool, it offers to keep it as one of the lines so you don't lose what you had.
 
 ## 🧩 Widgets
 
@@ -92,19 +92,19 @@ Content widgets (`news`, `soccer`, `worldcup`) can be combined on one line and r
 A **profile** is a complete, named set of lines — e.g. `default` and `matchday`. Manage them straight from the CLI, no need to re-run `init`:
 
 ```bash
-claudebar profile                 # list profiles, marks the active one
-claudebar profile use matchday    # switch by hand
-claudebar profile add matchday    # build a new profile's rows
-claudebar profile edit default    # rebuild a profile's rows
-claudebar profile remove matchday # delete it (aliases: rm, delete)
+claudelobby profile                 # list profiles, marks the active one
+claudelobby profile use matchday    # switch by hand
+claudelobby profile add matchday    # build a new profile's rows
+claudelobby profile edit default    # rebuild a profile's rows
+claudelobby profile remove matchday # delete it (aliases: rm, delete)
 ```
 
 Or schedule switches by time of day. Each **switch** flips the active profile at a wall-clock time; a manual switch holds until the next scheduled one fires. The day wraps past midnight, so the last switch of the day carries over into the early hours.
 
 ```bash
-claudebar profile switch add 18:00 matchday
-claudebar profile switch add 23:00 default
-claudebar profile switch remove 18:00
+claudelobby profile switch add 18:00 matchday
+claudelobby profile switch add 23:00 default
+claudelobby profile switch remove 18:00
 ```
 
 > Example: a `default` profile during the day, switch to `matchday` at 18:00, back to `default` at 23:00.
@@ -113,7 +113,7 @@ Deleting a profile also removes any scheduled switches that pointed to it, and r
 
 ## ⚙️ Configuration
 
-Config lives at `~/.claudebar/config.json`. Re-run `claudebar init` to rebuild it interactively, or edit the JSON directly:
+Config lives at `~/.claudelobby/config.json`. Re-run `claudelobby init` to rebuild it interactively, or edit the JSON directly:
 
 ```jsonc
 {
@@ -141,38 +141,38 @@ Config lives at `~/.claudebar/config.json`. Re-run `claudebar init` to rebuild i
 - **`switches`** — `{ at, profile }` pairs that flip the active profile at a time of day. Omit for manual-only switching.
 - **`interval`** — seconds each item stays before the line rotates.
 
-Cached network data is stored under `~/.claudebar/cache/` with short TTLs.
+Cached network data is stored under `~/.claudelobby/cache/` with short TTLs.
 
 ## 🖥️ Commands
 
 | Command | Description |
 |---|---|
-| `claudebar init` | Interactive setup. |
-| `claudebar run` | Render the lines once — this is what Claude Code calls on each refresh. |
-| `claudebar profile` | List profiles, marking the active one. |
-| `claudebar profile use <name>` | Switch profile, holding until the next scheduled switch. |
-| `claudebar profile add [name]` | Create a profile and build its rows. |
-| `claudebar profile edit <name>` | Rebuild a profile's rows. |
-| `claudebar profile remove <name>` | Delete a profile (aliases: `rm`, `delete`). |
-| `claudebar profile switch add <HH:MM> <name>` | Schedule an automatic switch. |
-| `claudebar profile switch remove <HH:MM>` | Remove a scheduled switch (aliases: `rm`, `delete`). |
+| `claudelobby init` | Interactive setup. |
+| `claudelobby run` | Render the lines once — this is what Claude Code calls on each refresh. |
+| `claudelobby profile` | List profiles, marking the active one. |
+| `claudelobby profile use <name>` | Switch profile, holding until the next scheduled switch. |
+| `claudelobby profile add [name]` | Create a profile and build its rows. |
+| `claudelobby profile edit <name>` | Rebuild a profile's rows. |
+| `claudelobby profile remove <name>` | Delete a profile (aliases: `rm`, `delete`). |
+| `claudelobby profile switch add <HH:MM> <name>` | Schedule an automatic switch. |
+| `claudelobby profile switch remove <HH:MM>` | Remove a scheduled switch (aliases: `rm`, `delete`). |
 
 ## 🔌 How it connects to Claude Code
 
-`claudebar init` adds this to `~/.claude/settings.json`:
+`claudelobby init` adds this to `~/.claude/settings.json`:
 
 ```json
 {
   "statusLine": {
     "type": "command",
-    "command": "claudebar run",
+    "command": "claudelobby run",
     "padding": 0,
     "refreshInterval": 1000
   }
 }
 ```
 
-Claude Code calls `claudebar run` on each refresh and renders whatever it prints. To remove claudebar, delete that `statusLine` block (or point it back at your previous tool).
+Claude Code calls `claudelobby run` on each refresh and renders whatever it prints. To remove claudelobby, delete that `statusLine` block (or point it back at your previous tool).
 
 ## 🛠️ Development
 

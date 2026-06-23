@@ -107,7 +107,7 @@ export async function init(): Promise<void> {
   bail(updateSettings);
   if (updateSettings) {
     const settings = loadClaudeSettings();
-    settings.statusLine = { type: 'command', command: 'claudebar run', padding: 0, refreshInterval: 1000 };
+    settings.statusLine = { type: 'command', command: 'claudelobby run', padding: 0, refreshInterval: 1000 };
     saveClaudeSettings(settings);
   }
 

@@ -5,7 +5,7 @@ export function detectExistingStatusLine() {
     if (!sl?.command)
         return null;
     const cmd = sl.command;
-    if (cmd.includes('claudebar'))
+    if (cmd.includes('claudelobby'))
         return null; // already us
     const name = cmd.includes('ccstatusline') ? 'ccstatusline'
         : cmd.includes('npx') ? 'npx tool'

@@ -19,7 +19,7 @@ switch (cmd) {
     break;
 
   default:
-    console.log(`claudebar <command>
+    console.log(`claudelobby <command>
 
   init                              Interactive setup
   run                               Render and print the status bar lines

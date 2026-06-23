@@ -50,7 +50,7 @@ async function readStdin() {
 export async function run() {
     const config = loadConfig();
     if (!config) {
-        console.log('claudebar: not configured. Run: claudebar init');
+        console.log('claudelobby: not configured. Run: claudelobby init');
         return;
     }
     const stdin = await readStdin();

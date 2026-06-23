@@ -1,6 +1,6 @@
 # Development
 
-Notes for hacking on claudebar itself. For usage, see [README.md](./README.md).
+Notes for hacking on claudelobby itself. For usage, see [README.md](./README.md).
 
 ## Setup
 
@@ -31,7 +31,7 @@ src/
     news.ts       # RSS headlines
     soccer.ts     # football news (RSS)
     passthrough.ts# runs an arbitrary command, output verbatim
-    cache.ts      # tiny file cache with TTL (~/.claudebar/cache)
+    cache.ts      # tiny file cache with TTL (~/.claudelobby/cache)
     shorten.ts    # text-shortening helpers
     rss.ts        # minimal RSS fetch/parse
   runner.ts       # resolves active lines, runs widgets, prints output
@@ -42,8 +42,8 @@ src/
 
 ## How a render works
 
-1. Claude Code calls `claudebar run` and pipes a JSON payload on stdin.
-2. `runner.run()` loads `~/.claudebar/config.json` and calls `resolveLines()`, which picks the active profile (manual override → scheduled switch → `activeProfile`) and returns its lines.
+1. Claude Code calls `claudelobby run` and pipes a JSON payload on stdin.
+2. `runner.run()` loads `~/.claudelobby/config.json` and calls `resolveLines()`, which picks the active profile (manual override → scheduled switch → `activeProfile`) and returns its lines.
 3. Each line's widgets are fetched in parallel; their items are flattened and the current one is picked from a time-based index (so the bar rotates without keeping state).
 4. `passthrough` lines are special: their command runs with the stdin payload forwarded, and the output is printed verbatim (so tools like `ccstatusline` work unchanged).
 
@@ -59,8 +59,8 @@ If the widget hits the network, cache responses via `src/widgets/cache.ts` (`loa
 
 ## Caches & config locations
 
-- Config: `~/.claudebar/config.json`
-- Cache: `~/.claudebar/cache/*.json`
+- Config: `~/.claudelobby/config.json`
+- Cache: `~/.claudelobby/cache/*.json`
 - Claude Code settings touched: `~/.claude/settings.json` (`statusLine` block only)
 
 ## Type-checking
