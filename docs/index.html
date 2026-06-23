@@ -246,16 +246,23 @@
     <div class="cfg-grid" style="margin-top:8px">
       <div>
         <h3>Profiles</h3>
-        <p>A profile is a complete, named set of rows — e.g. <code>default</code> and <code>matchday</code>. Switch by hand at any time:</p>
-        <pre><span class="n">claudebar</span> profile            <span class="c"># list, marks the active one</span>
-<span class="n">claudebar</span> profile use matchday</pre>
+        <p>A profile is a complete, named set of rows — e.g. <code>default</code> and <code>matchday</code>. Manage them from the CLI, no need to re-run <code>init</code>:</p>
+        <pre><span class="n">claudebar</span> profile                 <span class="c"># list, marks the active one</span>
+<span class="n">claudebar</span> profile use matchday    <span class="c"># switch by hand</span>
+<span class="n">claudebar</span> profile add matchday    <span class="c"># build a new profile</span>
+<span class="n">claudebar</span> profile edit default    <span class="c"># rebuild its rows</span>
+<span class="n">claudebar</span> profile remove matchday <span class="c"># delete (rm, delete)</span></pre>
         <p>Or schedule switches by time of day. Each <code>switch</code> flips the active profile at a wall-clock time; a manual switch holds until the next scheduled one. Windows wrap past midnight.</p>
+        <pre><span class="n">claudebar</span> profile switch add 18:00 matchday
+<span class="n">claudebar</span> profile switch remove 18:00</pre>
         <h3>Commands</h3>
         <table>
           <tr><td><code>claudebar init</code></td><td>Interactive setup.</td></tr>
           <tr><td><code>claudebar run</code></td><td>Render the rows once.</td></tr>
           <tr><td><code>claudebar profile</code></td><td>List profiles.</td></tr>
-          <tr><td><code>claudebar profile use &lt;name&gt;</code></td><td>Switch profile.</td></tr>
+          <tr><td><code>claudebar profile use &lt;name&gt;</code></td><td>Switch by hand.</td></tr>
+          <tr><td><code>claudebar profile add / edit / remove</code></td><td>Manage profiles.</td></tr>
+          <tr><td><code>claudebar profile switch add / remove</code></td><td>Schedule switches.</td></tr>
         </table>
       </div>
       <div>

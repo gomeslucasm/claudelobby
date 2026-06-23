@@ -18,8 +18,9 @@ npm run dev        # run the CLI from TS sources via ts-node
 src/
   cli/
     index.ts      # entry point + command dispatch (init | run | profile)
-    profile.ts    # `profile` command — list / use
-    init.ts       # interactive setup wizard (@clack/prompts)
+    init.ts       # interactive setup wizard
+    profile.ts    # `profile` command — list / use / add / edit / remove / switch
+    wizard.ts     # shared interactive line builder (used by init + profile)
     detect.ts     # detects an existing statusLine tool to wrap
   widgets/
     worldcup.ts   # FIFA World Cup scoreboard (ESPN)
@@ -47,7 +48,7 @@ src/
 1. Add the widget's config shape to `src/types.ts` and include it in the `WidgetConfig` union.
 2. Create `src/widgets/<name>.ts` exporting `getItems(config, lang?): Promise<string[]>`. Each returned string is one rotation item.
 3. Wire it into the `switch` in `src/runner.ts` (`widgetItems`).
-4. Add it to the setup wizard in `src/cli/init.ts` (`WidgetType`, `configureWidget`, and the content-widget options).
+4. Add it to the shared line builder in `src/cli/wizard.ts` (`WidgetType`, `configureWidget`, and the content-widget options) — both `init` and `profile add/edit` pick it up.
 5. Add any user-facing strings to `src/i18n.ts` for both `en` and `pt`.
 
 If the widget hits the network, cache responses via `src/widgets/cache.ts` (`loadCache`/`saveCache`) with a sensible TTL — the bar refreshes roughly once a second, so uncached fetches would be abusive.

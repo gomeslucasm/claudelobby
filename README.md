@@ -89,16 +89,27 @@ Content widgets (`news`, `soccer`, `worldcup`) can be combined on one line and r
 
 ## 🗂️ Profiles
 
-A **profile** is a complete, named set of lines — e.g. `default` and `matchday`. Switch by hand at any time:
+A **profile** is a complete, named set of lines — e.g. `default` and `matchday`. Manage them straight from the CLI, no need to re-run `init`:
 
 ```bash
-claudebar profile            # list profiles, marks the active one
-claudebar profile use matchday
+claudebar profile                 # list profiles, marks the active one
+claudebar profile use matchday    # switch by hand
+claudebar profile add matchday    # build a new profile's rows
+claudebar profile edit default    # rebuild a profile's rows
+claudebar profile remove matchday # delete it (aliases: rm, delete)
 ```
 
 Or schedule switches by time of day. Each **switch** flips the active profile at a wall-clock time; a manual switch holds until the next scheduled one fires. The day wraps past midnight, so the last switch of the day carries over into the early hours.
 
+```bash
+claudebar profile switch add 18:00 matchday
+claudebar profile switch add 23:00 default
+claudebar profile switch remove 18:00
+```
+
 > Example: a `default` profile during the day, switch to `matchday` at 18:00, back to `default` at 23:00.
+
+Deleting a profile also removes any scheduled switches that pointed to it, and re-points the active profile if needed.
 
 ## ⚙️ Configuration
 
@@ -140,6 +151,11 @@ Cached network data is stored under `~/.claudebar/cache/` with short TTLs.
 | `claudebar run` | Render the lines once — this is what Claude Code calls on each refresh. |
 | `claudebar profile` | List profiles, marking the active one. |
 | `claudebar profile use <name>` | Switch profile, holding until the next scheduled switch. |
+| `claudebar profile add [name]` | Create a profile and build its rows. |
+| `claudebar profile edit <name>` | Rebuild a profile's rows. |
+| `claudebar profile remove <name>` | Delete a profile (aliases: `rm`, `delete`). |
+| `claudebar profile switch add <HH:MM> <name>` | Schedule an automatic switch. |
+| `claudebar profile switch remove <HH:MM>` | Remove a scheduled switch (aliases: `rm`, `delete`). |
 
 ## 🔌 How it connects to Claude Code
 
