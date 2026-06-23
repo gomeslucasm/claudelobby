@@ -7,6 +7,8 @@
 Compose widgets — news headlines, football scores, the live World Cup scoreboard —
 into the status line at the bottom of your terminal, and swap what's shown by time of day.
 
+**[gomeslucasm.github.io/claudelobby →](https://gomeslucasm.github.io/claudelobby/)**
+
 ![claudelobby running in Claude Code](docs/screenshot.png)
 
 </div>
