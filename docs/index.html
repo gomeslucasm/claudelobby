@@ -3,10 +3,10 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>claudebar — a status bar for Claude Code</title>
-<meta name="description" content="A multi-line status bar for Claude Code. Show news, football, and the live World Cup in your terminal, and switch what's shown with profiles." />
+<title>claudebar — the waiting-room display for Claude Code</title>
+<meta name="description" content="claudebar turns the bottom of your terminal into a waiting-room monitor — news, football, the live World Cup, and the time — running while Claude Code does the work." />
 <meta property="og:title" content="claudebar" />
-<meta property="og:description" content="A multi-line status bar for Claude Code. News, football, the live World Cup — and profiles to switch what's shown." />
+<meta property="og:description" content="While Claude works, you wait. Might as well check the score. A multi-line status bar for Claude Code." />
 <meta property="og:image" content="screenshot.png" />
 <meta name="theme-color" content="#0e0e13" />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -16,7 +16,7 @@
   :root {
     --bg:#0e0e13; --panel:#15151c; --code:#16161e; --line:#26262f;
     --text:#d7dae3; --muted:#8a8e9e; --dim:#5b5e6e;
-    --accent:#d97757; --link:#9bb4ef; --green:#a6e3a1;
+    --accent:#d97757; --amber:#f0b35a; --link:#9bb4ef; --green:#a6e3a1;
     --sans:"Inter",system-ui,-apple-system,sans-serif;
     --mono:"JetBrains Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
   }
@@ -36,111 +36,155 @@
   nav { border-bottom:1px solid var(--line); }
   .nav { display:flex; align-items:center; justify-content:space-between; height:60px; }
   .brand { font-family:var(--mono); font-weight:700; font-size:16px; letter-spacing:-.01em; }
-  .brand b { color:var(--accent); font-weight:700; }
-  .nav a { color:var(--muted); font-size:14px; }
+  .brand b { color:var(--accent); }
+  .nav .right { display:flex; align-items:center; gap:18px; font-size:14px; }
+  .nav a { color:var(--muted); }
   .nav a:hover { color:var(--text); text-decoration:none; }
+  .nav .navclock { font-family:var(--mono); font-size:12px; color:var(--amber); font-variant-numeric:tabular-nums; }
 
   /* hero */
-  header { padding:64px 0 8px; }
+  header { padding:56px 0 8px; }
+  .eyebrow {
+    font-family:var(--mono); font-size:12px; letter-spacing:.18em; text-transform:uppercase;
+    color:var(--amber); display:inline-flex; align-items:center; gap:9px;
+  }
+  .eyebrow::before { content:""; width:7px; height:7px; border-radius:50%; background:var(--amber); animation:beat 1.8s ease-in-out infinite; }
+  @keyframes beat { 0%,100%{opacity:.35} 50%{opacity:1} }
   h1 {
     font-family:var(--mono); font-weight:700; letter-spacing:-.02em;
-    font-size:clamp(30px,5vw,42px); line-height:1.1;
+    font-size:clamp(28px,4.6vw,40px); line-height:1.12; margin-top:16px; max-width:20ch;
   }
   h1 b { color:var(--accent); }
-  .tagline { margin-top:16px; font-size:clamp(17px,2.4vw,19px); color:var(--text); max-width:60ch; }
-  .sub { margin-top:12px; color:var(--muted); max-width:62ch; }
+  .tagline { margin-top:18px; font-size:clamp(16px,2.2vw,18px); color:var(--text); max-width:60ch; }
+  .tagline b { color:var(--text); font-weight:600; }
+  .aside { margin-top:8px; color:var(--muted); font-size:14.5px; max-width:58ch; }
+
+  /* ── the waiting-room monitor ── */
+  .monitor {
+    margin-top:34px; border:1px solid var(--line); border-radius:12px; overflow:hidden;
+    background:#0b0b0f; box-shadow:0 24px 60px -40px #000;
+  }
+  .monitor__head {
+    display:flex; align-items:center; justify-content:space-between;
+    padding:10px 15px; border-bottom:1px solid var(--line); background:#101015;
+    font-family:var(--mono); font-size:12px;
+  }
+  .now { color:var(--amber); letter-spacing:.14em; }
+  .now::before { content:"● "; }
+  .clock { color:var(--amber); font-variant-numeric:tabular-nums; letter-spacing:.05em; }
+  .monitor__screen { position:relative; padding:26px 22px 22px; min-height:118px; }
+  .monitor__screen::after {        /* faint CRT scanlines */
+    content:""; position:absolute; inset:0; pointer-events:none; opacity:.5;
+    background:repeating-linear-gradient(0deg, transparent 0 2px, rgba(0,0,0,.16) 2px 3px);
+  }
+  .panel { font-family:var(--mono); font-size:clamp(13px,2.3vw,16px); line-height:1.5; color:#e9ecf5; min-height:48px; }
+  .panel .tag { color:var(--link); } .panel .live { color:var(--green); font-weight:700; }
+  .panel .ft { color:var(--muted); font-weight:700; } .panel .sc { color:#fff; font-weight:700; }
+  .panel .small { color:var(--dim); }
+  .wait { margin-top:14px; font-family:var(--mono); font-size:12.5px; color:var(--muted); }
+  .wait .dot { animation:fade 1.4s infinite; } .wait .dot:nth-child(2){animation-delay:.2s} .wait .dot:nth-child(3){animation-delay:.4s}
+  @keyframes fade { 0%,100%{opacity:.2} 50%{opacity:1} }
+  .ticker { border-top:1px solid var(--line); background:#101015; overflow:hidden; padding:8px 0; }
+  .ticker__track {
+    display:inline-block; white-space:nowrap; font-family:var(--mono); font-size:12.5px; color:var(--amber);
+    animation:marquee 26s linear infinite; will-change:transform;
+  }
+  .ticker__track span { margin:0 28px; } .ticker__track .b { color:#fff; font-weight:700; }
+  @keyframes marquee { from{transform:translateX(0)} to{transform:translateX(-50%)} }
+
+  /* CTA */
+  .cta { margin-top:30px; display:flex; flex-wrap:wrap; align-items:center; gap:12px; }
+  .install {
+    display:flex; align-items:center; gap:12px; background:var(--code); border:1px solid var(--line);
+    border-radius:8px; padding:13px 16px; font-family:var(--mono); font-size:14px; flex:1; min-width:280px;
+  }
+  .install .p { color:var(--accent); } .install code { flex:1; overflow-x:auto; white-space:nowrap; color:var(--text); scrollbar-width:none; }
+  .install code::-webkit-scrollbar { display:none; }
+  .copy { flex:none; background:transparent; border:1px solid var(--line); color:var(--muted); font-family:var(--mono); font-size:12px; padding:5px 10px; border-radius:6px; cursor:pointer; }
+  .copy:hover { color:var(--text); border-color:var(--dim); } .copy.ok { color:var(--green); border-color:var(--green); }
+  .gh { display:inline-flex; align-items:center; padding:13px 18px; background:var(--accent); color:#1a120e; border-radius:8px; font-weight:600; font-size:14px; }
+  .gh:hover { background:#e08a6e; text-decoration:none; }
 
   /* screenshot */
-  figure { margin:36px 0 8px; border:1px solid var(--line); border-radius:10px; overflow:hidden; background:var(--panel); }
+  figure { margin:30px 0 8px; border:1px solid var(--line); border-radius:10px; overflow:hidden; background:var(--panel); }
   figure img { display:block; width:100%; height:auto; }
   figcaption { padding:11px 16px; border-top:1px solid var(--line); color:var(--muted); font-size:13px; }
 
   /* sections */
-  section { padding:44px 0; border-top:1px solid var(--line); }
-  section:first-of-type { border-top:0; }
-  h2 {
-    font-family:var(--mono); font-size:13px; font-weight:700; letter-spacing:.12em;
-    text-transform:uppercase; color:var(--accent); margin-bottom:18px;
-  }
+  section { padding:46px 0; border-top:1px solid var(--line); }
+  h2 { font-family:var(--mono); font-size:13px; font-weight:700; letter-spacing:.12em; text-transform:uppercase; color:var(--accent); margin-bottom:6px; }
+  .h2sub { color:var(--muted); font-size:14.5px; margin-bottom:20px; font-style:italic; }
   h3 { font-size:17px; font-weight:600; margin:26px 0 6px; }
   section p { color:var(--muted); margin-bottom:14px; }
   section p b, li b { color:var(--text); font-weight:600; }
-  section > .wrap > p:last-child { margin-bottom:0; }
 
-  /* feature list */
   ul.feat { list-style:none; display:flex; flex-direction:column; gap:14px; }
   ul.feat li { color:var(--muted); padding-left:22px; position:relative; }
   ul.feat li::before { content:"›"; position:absolute; left:0; color:var(--accent); font-family:var(--mono); font-weight:700; }
 
-  /* code blocks */
-  pre {
-    background:var(--code); border:1px solid var(--line); border-radius:8px;
-    padding:16px 18px; overflow-x:auto; font-family:var(--mono); font-size:13.5px;
-    line-height:1.7; margin:6px 0 16px; color:var(--text);
-  }
+  pre { background:var(--code); border:1px solid var(--line); border-radius:8px; padding:16px 18px; overflow-x:auto; font-family:var(--mono); font-size:13.5px; line-height:1.7; margin:6px 0 16px; color:var(--text); }
   pre .c { color:var(--dim); } pre .k { color:var(--link); } pre .s { color:var(--green); } pre .n { color:var(--accent); }
 
-  .cmd {
-    display:flex; align-items:center; gap:12px; background:var(--code);
-    border:1px solid var(--line); border-radius:8px; padding:13px 16px; margin:6px 0 16px;
-    font-family:var(--mono); font-size:14px;
-  }
-  .cmd .p { color:var(--accent); }
-  .cmd code { flex:1; overflow-x:auto; white-space:nowrap; color:var(--text); scrollbar-width:none; }
-  .cmd code::-webkit-scrollbar { display:none; }
-  .copy {
-    flex:none; background:transparent; border:1px solid var(--line); color:var(--muted);
-    font-family:var(--mono); font-size:12px; padding:5px 10px; border-radius:6px; cursor:pointer;
-  }
-  .copy:hover { color:var(--text); border-color:var(--dim); }
-  .copy.ok { color:var(--green); border-color:var(--green); }
-
-  /* steps */
-  ol.steps { list-style:none; counter-reset:s; display:flex; flex-direction:column; gap:20px; }
-  ol.steps li { counter-increment:s; padding-left:38px; position:relative; }
-  ol.steps li::before {
-    content:counter(s); position:absolute; left:0; top:1px; width:24px; height:24px;
-    border:1px solid var(--line); border-radius:6px; color:var(--accent);
-    font-family:var(--mono); font-size:13px; font-weight:700; display:grid; place-items:center;
-  }
-  ol.steps b { color:var(--text); }
-  ol.steps p { margin:4px 0 0; font-size:14.5px; }
-
-  /* table */
   table { width:100%; border-collapse:collapse; margin:6px 0 8px; font-size:14.5px; }
   th, td { text-align:left; padding:10px 12px; border-bottom:1px solid var(--line); vertical-align:top; }
   th { color:var(--muted); font-weight:500; font-size:13px; }
-  td:first-child { white-space:nowrap; }
-  td code { color:var(--accent); }
+  td:first-child { white-space:nowrap; } td code { color:var(--accent); }
 
-  /* footer */
   footer { border-top:1px solid var(--line); padding:30px 0 50px; color:var(--muted); font-size:13.5px; }
   .foot { display:flex; flex-wrap:wrap; gap:16px; justify-content:space-between; }
+  .disclaimer { margin-top:14px; color:var(--dim); font-size:12.5px; font-style:italic; }
 
-  @media (max-width:560px) { .nav a.hide { display:none; } }
-  @media (prefers-reduced-motion:reduce) { html { scroll-behavior:auto; } }
+  @media (max-width:560px) { .nav a.hide, .navclock { display:none; } }
+  @media (prefers-reduced-motion:reduce) {
+    .ticker__track, .eyebrow::before, .wait .dot { animation:none !important; }
+    html { scroll-behavior:auto; }
+  }
 </style>
 </head>
 <body>
 
 <nav><div class="wrap nav">
   <span class="brand">claude<b>bar</b></span>
-  <span>
-    <a class="hide" href="#install">Install</a>&nbsp;&nbsp;
-    <a class="hide" href="#configure">Configure</a>&nbsp;&nbsp;
+  <span class="right">
+    <span class="navclock" id="navclock">--:--</span>
+    <a class="hide" href="#install">Install</a>
+    <a class="hide" href="#configure">Configure</a>
     <a href="https://github.com/gomeslucasm/claudebar">GitHub</a>
   </span>
 </div></nav>
 
 <div class="wrap">
   <header>
-    <h1>claude<b>bar</b></h1>
-    <p class="tagline">A multi-line status bar for Claude Code.</p>
-    <p class="sub">It composes widgets — news headlines, football scores, the live World Cup scoreboard — into the status line at the bottom of your terminal, and lets you switch what's shown with named <b>profiles</b>. Already use a status line like <code>ccstatusline</code>? Keep it as one of the lines.</p>
+    <span class="eyebrow">Ambient display for Claude Code</span>
+    <h1>While Claude works, you wait. Might as well check the <b>score</b>.</h1>
+    <p class="tagline">claudebar turns the bottom of your terminal into a <b>waiting-room monitor</b> — news, football, the live World Cup, and the time — quietly running while the agent does the actual heavy lifting.</p>
+    <p class="aside">You know the screen above the elevator. The one in the dentist's lobby. Now it's under your prompt.</p>
+
+    <!-- the lobby monitor -->
+    <div class="monitor" aria-label="A mock waiting-room display showing rotating headlines and scores">
+      <div class="monitor__head">
+        <span class="now">NOW SHOWING</span>
+        <span class="clock" id="clock">--:--:--</span>
+      </div>
+      <div class="monitor__screen">
+        <div class="panel" id="panel">&nbsp;</div>
+        <div class="wait">your agent is thinking<span class="dot">.</span><span class="dot">.</span><span class="dot">.</span> please remain seated</div>
+      </div>
+      <div class="ticker"><div class="ticker__track" id="ticker"></div></div>
+    </div>
+
+    <div class="cta">
+      <div class="install">
+        <span class="p">$</span>
+        <code id="cmd">npm install -g github:gomeslucasm/claudebar</code>
+        <button class="copy" id="copy" aria-label="Copy install command">copy</button>
+      </div>
+      <a class="gh" href="https://github.com/gomeslucasm/claudebar">GitHub →</a>
+    </div>
 
     <figure>
       <img src="screenshot.png" alt="claudebar showing three rows at the bottom of Claude Code: a news headline, a finished World Cup match with every scorer named, and a football headline." loading="lazy" />
-      <figcaption>Three rows under a live session — news, a 5×0 with every scorer named, and football. The bottom row is the untouched Claude Code status line.</figcaption>
+      <figcaption>The real thing: three rows under a live session — news, a 5×0 with every scorer named, and football. The bottom row is your untouched Claude Code status line.</figcaption>
     </figure>
   </header>
 </div>
@@ -148,35 +192,33 @@
 <div class="wrap">
 
   <section>
-    <div class="wrap" style="padding:0;max-width:none">
     <h2>What it does</h2>
+    <p class="h2sub">Like the screen above an elevator, but it answers to <code>~/.claude/settings.json</code>.</p>
     <ul class="feat">
       <li><b>Stacks widgets into rows.</b> Each row cycles through its items every few seconds — news, football, the live World Cup scoreboard (with scorers next to each team).</li>
-      <li><b>Keeps your current status line.</b> Wrap <code>ccstatusline</code> or any command and run it as one of the rows.</li>
-      <li><b>Switches with profiles.</b> A profile is a named set of rows. Change it by hand, or have it switch automatically at set times of day.</li>
+      <li><b>Keeps your current status line.</b> Wrap <code>ccstatusline</code> or any command and run it as one of the rows. Your real bar still does its job; the entertainment just sits next to it.</li>
+      <li><b>Switches with profiles.</b> A profile is a named set of rows. Change it by hand, or have it switch automatically at set times — coffee-break programming.</li>
     </ul>
-    </div>
   </section>
 
   <section id="install">
-    <div class="wrap" style="padding:0;max-width:none">
     <h2>Install</h2>
+    <p class="h2sub">Two commands and a restart. No remote control required.</p>
     <p>Requires Node.js 18+ and Claude Code. Install straight from GitHub — it builds itself:</p>
-    <div class="cmd">
+    <div class="install" style="margin:6px 0 16px">
       <span class="p">$</span>
-      <code id="cmd">npm install -g github:gomeslucasm/claudebar</code>
-      <button class="copy" id="copy" aria-label="Copy install command">copy</button>
+      <code id="cmd2">npm install -g github:gomeslucasm/claudebar</code>
+      <button class="copy" data-src="cmd2" aria-label="Copy install command">copy</button>
     </div>
     <p>Then run the interactive setup. It writes the <code>statusLine</code> hook into <code>~/.claude/settings.json</code> for you:</p>
-    <pre><span class="p" style="color:var(--accent)">$</span> claudebar init</pre>
+    <pre><span style="color:var(--accent)">$</span> claudebar init</pre>
     <figure style="margin:6px 0 16px"><img src="setup.gif" alt="The claudebar init wizard: choosing language, naming a profile, and building each line." loading="lazy" /></figure>
     <p>Restart Claude Code and the bar appears. To update later, run the install command again.</p>
-    </div>
   </section>
 
   <section id="configure">
-    <div class="wrap" style="padding:0;max-width:none">
     <h2>Configure</h2>
+    <p class="h2sub">What plays, where, and when.</p>
     <p><code>claudebar init</code> covers everything below interactively. You can also edit <code>~/.claudebar/config.json</code> directly.</p>
 
     <h3>Rows &amp; widgets</h3>
@@ -221,22 +263,60 @@
       <tr><td><code>claudebar profile</code></td><td>List profiles, marking the active one.</td></tr>
       <tr><td><code>claudebar profile use &lt;name&gt;</code></td><td>Switch profile until the next scheduled switch.</td></tr>
     </table>
-    </div>
   </section>
 
 </div>
 
-<footer><div class="wrap foot">
-  <span>MIT · Node 18+</span>
-  <a href="https://github.com/gomeslucasm/claudebar">github.com/gomeslucasm/claudebar</a>
+<footer><div class="wrap">
+  <div class="foot">
+    <span>MIT · Node 18+</span>
+    <a href="https://github.com/gomeslucasm/claudebar">github.com/gomeslucasm/claudebar</a>
+  </div>
+  <p class="disclaimer">claudebar accepts no liability for goals missed during long compiles, or for catching up on the news instead of the stack trace.</p>
 </div></footer>
 
 <script>
-  var btn = document.getElementById("copy");
-  btn.addEventListener("click", function () {
-    navigator.clipboard.writeText(document.getElementById("cmd").textContent).then(function () {
-      btn.textContent = "copied"; btn.classList.add("ok");
-      setTimeout(function () { btn.textContent = "copy"; btn.classList.remove("ok"); }, 1500);
+  // live clock — the one honest thing on a lobby display
+  function pad(n){ return String(n).padStart(2,"0"); }
+  function tick() {
+    var d = new Date();
+    var hms = pad(d.getHours())+":"+pad(d.getMinutes())+":"+pad(d.getSeconds());
+    var c = document.getElementById("clock"); if (c) c.textContent = hms;
+    var nc = document.getElementById("navclock"); if (nc) nc.textContent = hms.slice(0,5);
+  }
+  tick(); setInterval(tick, 1000);
+
+  // rotating "now showing" panel
+  var items = [
+    'FT  Portugal <span class="sc">5 × 0</span> Uzbekistan  <span class="small">· every scorer named</span>',
+    '<span class="tag">[HN]</span> Show HN: I watch the news inside my terminal now',
+    '<span class="live">🔴 LIVE 63\'</span>  Brazil <span class="sc">2 × 1</span> Croatia',
+    '<span class="tag">[The Verge]</span> Developer ships feature, misses the entire second half',
+    '<span class="ft">FT</span>  the build  <span class="sc">0 × 0</span>  your patience  <span class="small">· still running</span>'
+  ];
+  var reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  var panel = document.getElementById("panel");
+  var i = 0;
+  function show(){ panel.innerHTML = items[i % items.length]; i++; }
+  show();
+  if (!reduce) setInterval(show, 3400);
+
+  // scrolling ticker (content duplicated so the marquee loops seamlessly)
+  var feed = ['<span class="b">BREAKING</span> your compile is still running',
+    'Portugal lead at the half', 'HN front page just refreshed',
+    'the agent is thinking', 'do not adjust your terminal',
+    'World Cup live · 4 matches today', 'coffee is ready in the break room'];
+  var line = feed.map(function(t){ return '<span>'+t+'</span>'; }).join('<span>·</span>');
+  document.getElementById("ticker").innerHTML = line + '<span>·</span>' + line;
+
+  // copy buttons
+  document.querySelectorAll(".copy").forEach(function(btn){
+    btn.addEventListener("click", function(){
+      var src = btn.dataset.src || "cmd";
+      navigator.clipboard.writeText(document.getElementById(src).textContent).then(function(){
+        var t = btn.textContent; btn.textContent = "copied"; btn.classList.add("ok");
+        setTimeout(function(){ btn.textContent = t; btn.classList.remove("ok"); }, 1500);
+      });
     });
   });
 </script>
