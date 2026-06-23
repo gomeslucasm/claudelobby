@@ -63,6 +63,8 @@ If you'd rather not link, call `node /path/to/claudebar/dist/cli/index.js` direc
 claudebar init
 ```
 
+![claudebar init walkthrough](docs/setup.gif)
+
 The interactive setup walks you through:
 
 1. **Language** — English or Portuguese (BR).
