@@ -20,7 +20,7 @@ HN: Show HN: I built a … | TechCrunch: OpenAI announces …        (4s)
 claudebar isn't on npm yet — install it from source:
 
 ```bash
-git clone <your-private-repo-url> claudebar
+git clone https://github.com/gomeslucasm/claudebar.git
 cd claudebar
 npm install
 npm run build
