@@ -91,6 +91,16 @@ function parseEvents(data, lang) {
     }
     return { live, finished, upcoming };
 }
+// True when the match kicks off on the same calendar day as `ref`, in the
+// machine's local timezone (the same basis fmtUpcoming uses to print times).
+function isSameLocalDay(dateStr, ref) {
+    const d = new Date(dateStr);
+    if (Number.isNaN(d.getTime()))
+        return false;
+    return d.getFullYear() === ref.getFullYear()
+        && d.getMonth() === ref.getMonth()
+        && d.getDate() === ref.getDate();
+}
 // Formats using the machine's local timezone.
 function fmtUpcoming(m, lang) {
     try {
@@ -156,7 +166,27 @@ export async function getItems(_config, lang = 'en') {
         });
         return rotation;
     }
-    if (upcoming.length)
-        return [`${labels.cup}: ${upcoming.slice(0, 3).map(u => fmtUpcoming(u, lang)).join('  |  ')}`];
+    if (upcoming.length) {
+        // Show every match scheduled for today; only fall back to a capped preview
+        // of the next fixtures when there's nothing left today.
+        const todays = upcoming.filter(u => isSameLocalDay(u.date, new Date()));
+        const fixtures = (todays.length ? todays : upcoming.slice(0, 3)).map(u => fmtUpcoming(u, lang));
+        // Pack fixtures into rotation items that each fit the status line, so a full
+        // slate isn't silently truncated by the line-length cap in the runner.
+        const items = [];
+        let cur = [];
+        const render = (fs) => `${labels.cup}: ${fs.join('  |  ')}`;
+        for (const f of fixtures) {
+            if (cur.length && render([...cur, f]).length > 180) {
+                items.push(render(cur));
+                cur = [f];
+            }
+            else
+                cur.push(f);
+        }
+        if (cur.length)
+            items.push(render(cur));
+        return items;
+    }
     return [labels.none];
 }
